@@ -31,16 +31,28 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 const allowedOrigins = [
   'http://localhost:3000',
   'https://smartiotjs.netlify.app',
+  'https://smartiotjs.netlify.app/', // With trailing slash
   FRONTEND_URL
 ].filter(Boolean);
+
+// Normalize origin by removing trailing slash for comparison
+const normalizeOrigin = (origin) => {
+  if (!origin) return origin;
+  return origin.replace(/\/$/, ''); // Remove trailing slash
+};
 
 // Middleware
 app.use(cors({ 
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
+    
+    const normalizedOrigin = normalizeOrigin(origin);
+    const normalizedAllowed = allowedOrigins.map(normalizeOrigin);
+    
+    if (normalizedAllowed.includes(normalizedOrigin)) {
+      // Return the original origin (without trailing slash) to match browser
+      callback(null, normalizedOrigin);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
