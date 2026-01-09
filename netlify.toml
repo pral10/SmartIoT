@@ -1,5 +1,5 @@
 [build]
-  publish = "frontend/build"
+  publish = "build"
   command = "npm install && npm run build"
 
 [[redirects]]
