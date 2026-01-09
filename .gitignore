@@ -3,8 +3,36 @@ node_modules/
 
 # Environment files
 .env
+.env.local
+.env.production
+.env.development
 
 # Build outputs
 build/
 dist/
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+venv/
+env/
+
+# Logs
+*.log
+smartiot.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# OS
+Thumbs.db
