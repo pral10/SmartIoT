@@ -439,33 +439,76 @@ export default function Dashboard() {
       </div>
 
       {/* Device Health Panel */}
-      {showHealth && deviceHealth && (
+      {showHealth && (
         <div style={styles.healthPanel}>
           <div style={styles.panelHeader}>
-            <h3>Device Health</h3>
+            <h3>Device Health & Statistics</h3>
             <button onClick={() => setShowHealth(false)} style={styles.closeButton}>×</button>
           </div>
           <div style={styles.healthGrid}>
-            <div style={styles.healthCard}>
-              <div style={styles.healthLabel}>Status</div>
-              <div style={{ ...styles.healthValue, color: getHealthColor(deviceHealth.status) }}>
-                {deviceHealth.status}
-              </div>
-            </div>
-            <div style={styles.healthCard}>
-              <div style={styles.healthLabel}>Reliability</div>
-              <div style={styles.healthValue}>{deviceHealth.reliability_percent}%</div>
-            </div>
-            <div style={styles.healthCard}>
-              <div style={styles.healthLabel}>Uptime</div>
-              <div style={styles.healthValue}>{deviceHealth.uptime_hours.toFixed(1)} hours</div>
-            </div>
-            <div style={styles.healthCard}>
-              <div style={styles.healthLabel}>Readings</div>
-              <div style={styles.healthValue}>
-                {deviceHealth.successful_readings} / {deviceHealth.total_readings}
-              </div>
-            </div>
+            {deviceHealth ? (
+              <>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Status</div>
+                  <div style={{ ...styles.healthValue, color: getHealthColor(deviceHealth.status) }}>
+                    {deviceHealth.status || 'HEALTHY'}
+                  </div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Reliability</div>
+                  <div style={styles.healthValue}>{deviceHealth.reliability_percent || 'N/A'}%</div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Uptime</div>
+                  <div style={styles.healthValue}>{deviceHealth.uptime_hours ? deviceHealth.uptime_hours.toFixed(1) : 'N/A'} hours</div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Readings</div>
+                  <div style={styles.healthValue}>
+                    {deviceHealth.successful_readings || 0} / {deviceHealth.total_readings || 0}
+                  </div>
+                </div>
+              </>
+            ) : null}
+            {/* Always show computed stats from sensor data */}
+            {data.length > 0 && (
+              <>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Total Readings</div>
+                  <div style={styles.healthValue}>{data.length}</div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Data Range</div>
+                  <div style={styles.healthValue}>
+                    {statistics ? `${displayTemp(parseFloat(statistics.tempMin))} - ${displayTemp(parseFloat(statistics.tempMax))}` : 'N/A'}
+                  </div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Avg Temperature</div>
+                  <div style={styles.healthValue}>
+                    {statistics ? displayTemp(parseFloat(statistics.tempAvg)) : 'N/A'}
+                  </div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Avg Humidity</div>
+                  <div style={styles.healthValue}>
+                    {statistics ? `${statistics.humidityAvg}%` : 'N/A'}
+                  </div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Motion Events</div>
+                  <div style={styles.healthValue}>
+                    {data.filter(d => d.motion > 0).length}
+                  </div>
+                </div>
+                <div style={styles.healthCard}>
+                  <div style={styles.healthLabel}>Last Update</div>
+                  <div style={{ ...styles.healthValue, fontSize: '14px' }}>
+                    {latest ? formatTime(latest.timestamp) : 'N/A'}
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -677,8 +720,8 @@ export default function Dashboard() {
                 <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="colorPred" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#facc15" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#facc15" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.25}/>
+                <stop offset="95%" stopColor="#f59e0b" stopOpacity={0}/>
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
@@ -713,19 +756,19 @@ export default function Dashboard() {
               dataKey="temperature_display"
               name="Actual Temperature"
             stroke="#38bdf8"
-              fillOpacity={1}
+              fillOpacity={0.4}
               fill="url(#colorTemp)"
-              strokeWidth={2.5}
+              strokeWidth={3}
             />
             <Area
               type="monotone"
               dataKey="predicted_temp_display"
               name="Predicted Temperature"
-              stroke="#facc15"
-              fillOpacity={1}
+              stroke="#f59e0b"
+              fillOpacity={0.2}
               fill="url(#colorPred)"
-              strokeWidth={2.5}
-              strokeDasharray="5 5"
+              strokeWidth={3.5}
+              strokeDasharray="8 4"
             />
           </AreaChart>
         </ResponsiveContainer>
