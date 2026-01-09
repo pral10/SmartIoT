@@ -32,6 +32,11 @@ const SENSORS_ENDPOINT = `${API_BASE_URL}/api/sensors`;
 const CONFIG_ENDPOINT = `${API_BASE_URL}/api/config`;
 const DEVICE_HEALTH_ENDPOINT = `${API_BASE_URL}/api/device-health`;
 
+// Debug: Log API URL (only in development)
+if (process.env.NODE_ENV === 'development') {
+  console.log('API Base URL:', API_BASE_URL);
+}
+
 const POLL_INTERVAL = 5000; // Match backend update frequency
 const MAX_DATA_POINTS = 200;
 
@@ -180,7 +185,9 @@ export default function Dashboard() {
 
     } catch (err) {
       console.error("Fetch error:", err);
-      setError(`Failed to fetch data: ${err.message}`);
+      console.error("API URL being used:", SENSORS_ENDPOINT);
+      console.error("Error details:", err.response?.status, err.response?.data || err.message);
+      setError(`Failed to fetch data: ${err.message || 'Network Error'}. API: ${API_BASE_URL}`);
       setIsLoading(false);
     }
   }, [predictionMethod, predictionHorizon]);
